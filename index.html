@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SearXNG Browser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+        }
+        #controls {
+            backdrop-filter: blur(10px);
+        }
+        #url-input:focus {
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <!-- Navigation Controls -->
+    <div id="controls" class="flex items-center p-2 bg-gray-800 bg-opacity-80 border-b border-gray-700 shadow-md">
+        <button id="back-btn" class="p-2 rounded-full hover:bg-gray-700 transition-colors focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <button id="forward-btn" class="p-2 rounded-full hover:bg-gray-700 transition-colors focus:outline-none ml-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+        <div class="relative flex-grow mx-2">
+            <input type="text" id="url-input" class="w-full bg-gray-900 text-white rounded-full px-4 py-2 text-sm focus:outline-none border-2 border-transparent focus:border-blue-500 transition-colors" placeholder="Search with SearXNG or enter a URL">
+        </div>
+    </div>
+
+    <!-- Browser View -->
+    <iframe id="browser-view" src="https://searx.be/" class="flex-grow w-full h-full border-none"></iframe>
+
+    <script>
+        const { invoke } = window.__TAURI__.tauri;
+
+        const urlInput = document.getElementById('url-input');
+        const backBtn = document.getElementById('back-btn');
+        const forwardBtn = document.getElementById('forward-btn');
+        const browserView = document.getElementById('browser-view');
+
+        urlInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                const value = urlInput.value;
+                invoke('go_to_url', { url: value });
+            }
+        });
+          
+        backBtn.addEventListener('click', () => invoke('go_back'));
+        forwardBtn.addEventListener('click', () => invoke('go_forward'));
+
+        browserView.addEventListener('load', () => {
+            try {
+                const newUrl = browserView.contentWindow.location.href;
+                if (!newUrl.startsWith('about:blank')) {
+                    urlInput.value = newUrl;
+                }
+                const title = browserView.contentDocument.title;
+                invoke('update_title', { title: title });
+            } catch (e) {
+                // Cannot access iframe content from a different origin
+                console.warn("Cross-origin frame error. Can't update URL bar from iframe.", e);
+            }
+        });
+    </script>
+</body>
+</html>
