@@ -1,7 +1,7 @@
 {
   "build": {
     "beforeBuildCommand": "npm run build",
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "",
     "devPath": "../",
     "distDir": "../"
   },
@@ -28,7 +28,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.taurus.dev",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
