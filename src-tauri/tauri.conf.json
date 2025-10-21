@@ -2,8 +2,7 @@
   "build": {
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "",
-    "devPath": "../",
-    "distDir": "../"
+    "frontendDist": ".."
   },
   "package": {
     "productName": "SearXNG Browser",
